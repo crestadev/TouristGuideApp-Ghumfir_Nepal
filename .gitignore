@@ -1,0 +1,77 @@
+# ============================================
+# Ghumfir Nepal Django Project .gitignore
+# ============================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environment ---
+venv/
+env/
+ENV/
+.venv/
+.idea/
+
+# --- Django specific ---
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+static_root/
+build/
+*.mo
+
+# --- Local environment / secrets ---
+.env
+*.env
+
+# --- VS Code / PyCharm ---
+.vscode/
+.idea/
+*.iml
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+
+# --- Byte-compiled / cache ---
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+__pypackages__/
+*.manifest
+*.spec
+
+# --- Migrations cache (optional) ---
+*/migrations/__pycache__/
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# --- Node / frontend stuff (if added later) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Backup files ---
+*.bak
+*.swp
+*.swo
+
+# --- Coverage / testing ---
+.coverage
+htmlcov/
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+
+# --- Temporary files ---
+tmp/
+temp/
+*.tmp
