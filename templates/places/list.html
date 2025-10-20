@@ -1,27 +1,33 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Explore Places{% endblock %}
 
 {% block content %}
-<h2 class="mb-4 text-center">Explore Nepal's Destinations</h2>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Explore Nepal's Destinations</h2>
 
-<div class="row">
-  {% for place in places %}
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm">
-        {% if place.image %}
-          <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
-        {% else %}
-          <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="No image">
-        {% endif %}
-        <div class="card-body">
-          <h5 class="card-title">{{ place.name }}</h5>
-          <p class="card-text text-muted">{{ place.location }}</p>
-          <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
+  <div class="row">
+    {% for place in places %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          {% if place.image %}
+            <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
+          {% else %}
+            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="No image">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ place.name }}</h5>
+            <p class="text-muted">{{ place.location }}</p>
+            <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">
+              View Details
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  {% empty %}
-    <p>No places found yet.</p>
-  {% endfor %}
+    {% empty %}
+      <p class="text-center text-muted">No places found yet. Please add some from the admin panel.</p>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

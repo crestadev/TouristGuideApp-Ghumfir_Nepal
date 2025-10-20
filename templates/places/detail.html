@@ -1,45 +1,53 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}{{ place.name }}{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-8">
-    {% if place.image %}
-      <img src="{{ place.image.url }}" class="img-fluid rounded shadow-sm mb-3" alt="{{ place.name }}">
-    {% endif %}
-    <h2>{{ place.name }}</h2>
-    <p class="text-muted">{{ place.location }}</p>
-    <p>{{ place.description }}</p>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8">
+      {% if place.image %}
+        <img src="{{ place.image.url }}" class="img-fluid rounded shadow-sm mb-3" alt="{{ place.name }}">
+      {% endif %}
 
-    <h4 class="mt-5">Reviews</h4>
-    {% for review in reviews %}
-      <div class="border rounded p-2 mb-2">
-        <strong>{{ review.name }}</strong> — ⭐ {{ review.rating }}/5<br>
-        <small>{{ review.created_at|date:"M d, Y" }}</small>
-        <p>{{ review.comment }}</p>
-      </div>
-    {% empty %}
-      <p>No reviews yet. Be the first to review!</p>
-    {% endfor %}
-  </div>
+      <h2>{{ place.name }}</h2>
+      <p class="text-muted">{{ place.location }}</p>
+      <p>{{ place.description }}</p>
 
-  <div class="col-md-4">
-    <h4>Nearby Hotels</h4>
-    {% for hotel in related_hotels %}
-      <div class="card mb-3">
-        {% if hotel.image %}
-          <img src="{{ hotel.image.url }}" class="card-img-top" alt="{{ hotel.name }}">
-        {% endif %}
-        <div class="card-body">
-          <h5 class="card-title">{{ hotel.name }}</h5>
-          <p>{{ hotel.address }}</p>
-          <p class="text-muted">{{ hotel.price_range }}</p>
-          <small>{{ hotel.contact }}</small>
+      <hr>
+      <h4 class="mt-4">Visitor Reviews</h4>
+      {% for review in reviews %}
+        <div class="border rounded p-3 mb-3 bg-light">
+          <strong>{{ review.name }}</strong> — ⭐ {{ review.rating }}/5<br>
+          <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+          <p class="mt-2">{{ review.comment }}</p>
         </div>
-      </div>
-    {% empty %}
-      <p>No hotels listed for this place yet.</p>
-    {% endfor %}
+      {% empty %}
+        <p class="text-muted">No reviews yet. Be the first to share your experience!</p>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-4">
+      <h4 class="mb-3">Nearby Hotels</h4>
+      {% for hotel in related_hotels %}
+        <div class="card mb-3 shadow-sm border-0">
+          {% if hotel.image %}
+            <img src="{{ hotel.image.url }}" class="card-img-top" alt="{{ hotel.name }}">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ hotel.name }}</h5>
+            <p class="card-text">{{ hotel.address }}</p>
+            <p class="text-muted mb-1">{{ hotel.price_range }}</p>
+            {% if hotel.contact %}
+              <small class="text-muted">📞 {{ hotel.contact }}</small>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">No hotels listed for this place yet.</p>
+      {% endfor %}
+    </div>
   </div>
 </div>
 {% endblock %}
