@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Explore Places{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 text-center">Explore Nepal's Destinations</h2>
+
+<div class="row">
+  {% for place in places %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        {% if place.image %}
+          <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
+        {% else %}
+          <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="No image">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ place.name }}</h5>
+          <p class="card-text text-muted">{{ place.location }}</p>
+          <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>No places found yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}
