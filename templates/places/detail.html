@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ place.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    {% if place.image %}
+      <img src="{{ place.image.url }}" class="img-fluid rounded shadow-sm mb-3" alt="{{ place.name }}">
+    {% endif %}
+    <h2>{{ place.name }}</h2>
+    <p class="text-muted">{{ place.location }}</p>
+    <p>{{ place.description }}</p>
+
+    <h4 class="mt-5">Reviews</h4>
+    {% for review in reviews %}
+      <div class="border rounded p-2 mb-2">
+        <strong>{{ review.name }}</strong> — ⭐ {{ review.rating }}/5<br>
+        <small>{{ review.created_at|date:"M d, Y" }}</small>
+        <p>{{ review.comment }}</p>
+      </div>
+    {% empty %}
+      <p>No reviews yet. Be the first to review!</p>
+    {% endfor %}
+  </div>
+
+  <div class="col-md-4">
+    <h4>Nearby Hotels</h4>
+    {% for hotel in related_hotels %}
+      <div class="card mb-3">
+        {% if hotel.image %}
+          <img src="{{ hotel.image.url }}" class="card-img-top" alt="{{ hotel.name }}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ hotel.name }}</h5>
+          <p>{{ hotel.address }}</p>
+          <p class="text-muted">{{ hotel.price_range }}</p>
+          <small>{{ hotel.contact }}</small>
+        </div>
+      </div>
+    {% empty %}
+      <p>No hotels listed for this place yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
