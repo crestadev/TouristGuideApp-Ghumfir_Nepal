@@ -1,2 +1,10 @@
 body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
 footer { background: #f8f9fa; }
+
+form label {
+    font-weight: 600;
+  }
+  
+  form .form-control, form .form-select {
+    border-radius: 8px;
+  }
