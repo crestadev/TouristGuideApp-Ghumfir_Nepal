@@ -7,27 +7,43 @@
   <title>Ghumfir Nepal - {% block title %}{% endblock %}</title>
 
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-
-  {% load static %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  {% block extra_head %}{% endblock %}
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-      <a class="navbar-brand" href="/">Ghumfir Nepal</a>
-]    </div>
-  </nav>
 
-  <main class="container my-4">
-    {% block content %}{% endblock %}
-  </main>
+<!-- ✅ Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-primary" href="/">Ghumfir Nepal</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-  <footer class="text-center py-4">
-    &copy; Ghumfir Nepal
-  </footer>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path.startswith:'/places/' or request.path == '/places/' %}active{% endif %}" href="/places/">Explore</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="/about/">About</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-  {% block extra_js %}{% endblock %}
+<!-- ✅ Page content -->
+<main class="container my-4">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="text-center py-3 bg-light border-top">
+  <small>© 2025 Ghumfir Nepal | Explore the beauty of Nepal 🇳🇵</small>
+</footer>
+
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
