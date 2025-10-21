@@ -16,17 +16,40 @@
       <p>{{ place.description }}</p>
 
       <hr>
-      <h4 class="mt-4">Visitor Reviews</h4>
+      <h4 class="mt-5">Reviews</h4>
+
+      <!-- Display existing reviews -->
       {% for review in reviews %}
-        <div class="border rounded p-3 mb-3 bg-light">
+        <div class="border rounded p-2 mb-2">
           <strong>{{ review.name }}</strong> — ⭐ {{ review.rating }}/5<br>
-          <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
-          <p class="mt-2">{{ review.comment }}</p>
+          <small>{{ review.created_at|date:"M d, Y" }}</small>
+          <p>{{ review.comment }}</p>
         </div>
       {% empty %}
-        <p class="text-muted">No reviews yet. Be the first to share your experience!</p>
+        <p>No reviews yet. Be the first to review!</p>
       {% endfor %}
-    </div>
+      
+      <!-- Review Form -->
+      <div class="mt-4">
+        <h5>Add a Review</h5>
+        <form method="post" class="border rounded p-3 shadow-sm bg-light">
+          {% csrf_token %}
+          <div class="mb-3">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+          </div>
+          <div class="mb-3">
+            {{ form.rating.label_tag }}
+            {{ form.rating }}
+          </div>
+          <div class="mb-3">
+            {{ form.comment.label_tag }}
+            {{ form.comment }}
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+      </div>
+      
 
     <div class="col-md-4">
       <h4 class="mb-3">Nearby Hotels</h4>
