@@ -14,8 +14,23 @@ def about(request):
 def place_list(request):
     categories = Category.objects.all()
     places = Place.objects.all().order_by('name')
-    return render(request, 'places/list.html', {'places': places, 'categories': categories})
 
+    search_query = request.GET.get('q', '')
+    category_filter = request.GET.get('category', '')
+
+    if search_query:
+        places = places.filter(name__icontains=search_query) | places.filter(location__icontains=search_query)
+
+    if category_filter:
+        places = places.filter(category__id=category_filter)
+
+    context = {
+        'places': places,
+        'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
+    }
+    return render(request, 'places/list.html', context)
 def place_detail(request, slug):
     place = get_object_or_404(Place, slug=slug)
     related_hotels = place.hotels.all()
