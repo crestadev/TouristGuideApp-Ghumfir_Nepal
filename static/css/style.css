@@ -23,3 +23,16 @@ form label {
     color: #555;
   }
   
+  form input, form select {
+    border-radius: 8px;
+  }
+  
+  .card img {
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .btn-primary {
+    border-radius: 8px;
+  }
+  
