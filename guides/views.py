@@ -6,6 +6,9 @@ from .forms import ReviewForm
 def home(request):
     return render(request, 'home.html')
 
+def about(request):
+    return render(request, 'about.html')
+
 
 
 def place_list(request):
