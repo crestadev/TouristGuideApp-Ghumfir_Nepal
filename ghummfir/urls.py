@@ -9,8 +9,8 @@ urlpatterns = [
     path('', guide_views.home, name='home'),
     path('places/', include('guides.urls')),
     path('about/', guide_views.about, name='about'),
-    path('accounts/', include('django.contrib.auth.urls')), 
-
+    path('accounts/', include('accounts.urls')), 
+    path('accounts/', include('django.contrib.auth.urls')),  
 
 ]
 
