@@ -8,6 +8,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', guide_views.home, name='home'),
     path('places/', include('guides.urls')),
+    path('about/', guide_views.about, name='about'),
+
 ]
 
 if settings.DEBUG:
