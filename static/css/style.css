@@ -8,3 +8,18 @@ form label {
   form .form-control, form .form-select {
     border-radius: 8px;
   }
+  .navbar-brand {
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .nav-link.active {
+    font-weight: 600;
+    color: #0d6efd !important;
+  }
+  
+  footer {
+    background: #f8f9fa;
+    color: #555;
+  }
+  
