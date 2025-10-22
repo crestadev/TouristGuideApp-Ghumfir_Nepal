@@ -1,33 +1,44 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% block title %}Explore Places{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2 class="text-center mb-4">Explore Nepal's Destinations</h2>
+<h2 class="mb-4 text-center">Explore Nepal's Destinations</h2>
 
-  <div class="row">
-    {% for place in places %}
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm border-0">
-          {% if place.image %}
-            <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
-          {% else %}
-            <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="No image">
-          {% endif %}
-          <div class="card-body">
-            <h5 class="card-title">{{ place.name }}</h5>
-            <p class="text-muted">{{ place.location }}</p>
-            <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">
-              View Details
-            </a>
-          </div>
+<form method="get" class="row g-2 mb-4 justify-content-center">
+  <div class="col-md-4">
+    <input type="text" name="q" class="form-control" placeholder="Search by name or location" value="{{ search_query }}">
+  </div>
+  <div class="col-md-3">
+    <select name="category" class="form-select">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if category_filter|add:'' == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary w-100">Search</button>
+  </div>
+</form>
+
+=<div class="row">
+  {% for place in places %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        {% if place.image %}
+          <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
+        {% else %}
+          <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="No image">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ place.name }}</h5>
+          <p class="text-muted mb-2">{{ place.location }}</p>
+          <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
         </div>
       </div>
-    {% empty %}
-      <p class="text-center text-muted">No places found yet. Please add some from the admin panel.</p>
-    {% endfor %}
-  </div>
+    </div>
+  {% empty %}
+    <p class="text-center text-muted">No places found matching your search.</p>
+  {% endfor %}
 </div>
 {% endblock %}
