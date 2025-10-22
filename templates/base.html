@@ -11,28 +11,25 @@
 </head>
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-      <a class="navbar-brand fw-bold text-primary" href="/">Ghumfir Nepal</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      <a class="navbar-brand fw-bold" href="/">Ghumfir Nepal</a>
   
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if '/places/' in request.path %}active{% endif %}" href="/places/">Explore</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="/about/">About</a>
-          </li>
+      <div class="collapse navbar-collapse justify-content-end">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="/places/">Explore</a></li>
+          {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="#">Hi, {{ user.username }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign Up</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>
   </nav>
+  
   
 
 <main class="container my-4">
