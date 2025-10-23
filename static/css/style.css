@@ -35,4 +35,12 @@ form label {
   .btn-primary {
     border-radius: 8px;
   }
+
+  .alert {
+    border-radius: 8px;
+  }
+  
+  form input {
+    border-radius: 8px;
+  }
   
