@@ -33,7 +33,11 @@
             </ul>
           </li>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+                  <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign Up</a></li>
         {% endif %}
         
