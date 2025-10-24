@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
+from guides.models import Itinerary
+
 
 
 
@@ -23,7 +25,8 @@ def profile_view(request):
         else:
             messages.error(request, 'All fields are required.')
 
-    return render(request, 'accounts/profile.html')
+    itinerary = Itinerary.objects.filter(user=request.user).first()
+    return render(request, 'accounts/profile.html', {'itinerary': itinerary})
 
 
 def signup_view(request):
