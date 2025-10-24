@@ -1,6 +1,9 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from .models import Place, Category
+from .models import Place, Category, Itinerary
 from .forms import ReviewForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
 
 
 def home(request):
@@ -52,3 +55,11 @@ def place_detail(request, slug):
         'reviews': reviews,
         'form': form,
     })
+
+@login_required
+def add_to_itinerary(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    itinerary, created = Itinerary.objects.get_or_create(user=request.user)
+    itinerary.places.add(place)
+    messages.success(request, f"{place.name} added to your itinerary!")
+    return redirect('place_detail', slug=place.slug)
