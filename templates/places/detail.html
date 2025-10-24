@@ -15,6 +15,30 @@
       <p class="text-muted">{{ place.location }}</p>
       <p>{{ place.description }}</p>
 
+      <div class="container py-5">
+        <div class="row">
+          <div class="col-md-6">
+            {% if place.image %}
+              <img src="{{ place.image.url }}" class="img-fluid rounded" alt="{{ place.name }}">
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+            <h2>{{ place.name }}</h2>
+            <p class="text-muted">{{ place.location }}</p>
+            <p>{{ place.description }}</p>
+      
+            {% if user.is_authenticated %}
+              <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success mt-2">Add to My Itinerary</button>
+              </form>
+            {% else %}
+              <a href="{% url 'login' %}" class="btn btn-outline-primary mt-2">Login to Save</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
       <hr>
       <h4 class="mt-5">Reviews</h4>
 
