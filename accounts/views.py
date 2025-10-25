@@ -25,9 +25,26 @@ def profile_view(request):
         else:
             messages.error(request, 'All fields are required.')
 
+    # Get user's itinerary
     itinerary = Itinerary.objects.filter(user=request.user).first()
-    return render(request, 'accounts/profile.html', {'itinerary': itinerary})
 
+    # Prepare coordinates for map (if any)
+    places_with_coords = []
+    if itinerary:
+        for p in itinerary.places.all():
+            if p.latitude and p.longitude:
+                places_with_coords.append({
+                    'name': p.name,
+                    'lat': p.latitude,
+                    'lng': p.longitude,
+                    'location': p.location,
+                })
+
+    # Render template
+    return render(request, 'accounts/profile.html', {
+        'itinerary': itinerary,
+        'places_with_coords': places_with_coords,
+    })
 
 def signup_view(request):
     if request.method == 'POST':
