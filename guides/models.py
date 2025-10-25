@@ -25,6 +25,8 @@ class Place(models.Model):
     image = models.ImageField(upload_to='places/', blank=True, null=True)
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
     slug = models.SlugField(unique=True, blank=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -33,6 +35,7 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+
 
 
 class Hotel(models.Model):
