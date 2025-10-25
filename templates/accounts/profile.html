@@ -66,23 +66,22 @@
 <!--  Map Script -->
 {% if itinerary and itinerary.places.all %}
 <script>
-  const map = L.map('map').setView([28.3949, 84.1240], 7); // Center Nepal
+  document.addEventListener("DOMContentLoaded", function() {
+      const map = L.map('map').setView([28.3949, 84.1240], 7);
 
-  // Add OpenStreetMap tiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '© OpenStreetMap'
-  }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '© OpenStreetMap'
+      }).addTo(map);
 
-  // Pass data from Django
-  const places = {{ places_with_coords|safe }};
-
-  // Add markers dynamically
-  places.forEach(place => {
-      const marker = L.marker([place.lat, place.lng]).addTo(map);
-      marker.bindPopup(`<b>${place.name}</b><br>${place.location}`);
+      const places = {{ places_with_coords|safe }};
+      places.forEach(place => {
+          const marker = L.marker([place.lat, place.lng]).addTo(map);
+          marker.bindPopup(`<b>${place.name}</b><br>${place.location}`);
+      });
   });
 </script>
 {% endif %}
+
 
 {% endblock %}
