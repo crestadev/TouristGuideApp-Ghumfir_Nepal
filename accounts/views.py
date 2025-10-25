@@ -1,11 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from .models import Favorite
 
-from guides.models import Itinerary
+from guides.models import Itinerary, Place
 
 
 
@@ -56,3 +57,15 @@ def signup_view(request):
     else:
         form = UserCreationForm()
     return render(request, 'accounts/signup.html', {'form': form})
+
+@login_required
+def add_favorite(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    Favorite.objects.get_or_create(user=request.user, place=place)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def remove_favorite(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    Favorite.objects.filter(user=request.user, place=place).delete()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
