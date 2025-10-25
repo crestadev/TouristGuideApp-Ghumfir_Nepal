@@ -23,7 +23,7 @@
   </div>
 </form>
 
-=<div class="row">
+<div class="row">
   {% for place in places %}
     <div class="col-md-4 mb-4">
       <div class="card h-100 shadow-sm">
@@ -43,4 +43,12 @@
     <p class="text-center text-muted">No places found matching your search.</p>
   {% endfor %}
 </div>
+{% if user.is_authenticated %}
+  {% if place in user.favorites.all.values_list 'place', flat=True %}
+    <a href="{% url 'remove_favorite' place.id %}" class="btn btn-warning btn-sm">★ Remove Favorite</a>
+  {% else %}
+    <a href="{% url 'add_favorite' place.id %}" class="btn btn-outline-warning btn-sm">☆ Add to Favorites</a>
+  {% endif %}
+{% endif %}
+
 {% endblock %}
