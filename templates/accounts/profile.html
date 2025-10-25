@@ -28,6 +28,7 @@
     </div>
   </div>
 </div>
+
 <hr class="my-4">
 <h4 class="text-center mb-3">My Itinerary</h4>
 
@@ -50,6 +51,38 @@
   </div>
 {% else %}
   <p class="text-center text-muted">You haven’t added any places yet.</p>
+{% endif %}
+
+<!-- Map Section -->
+<hr class="my-4">
+<h4 class="text-center mb-3">My Itinerary Map</h4>
+
+{% if itinerary and itinerary.places.all %}
+  <div id="map" style="height: 500px; border-radius: 10px;"></div>
+{% else %}
+  <p class="text-center text-muted">Add places to your itinerary to see them on the map.</p>
+{% endif %}
+
+<!--  Map Script -->
+{% if itinerary and itinerary.places.all %}
+<script>
+  const map = L.map('map').setView([28.3949, 84.1240], 7); // Center Nepal
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  // Pass data from Django
+  const places = {{ places_with_coords|safe }};
+
+  // Add markers dynamically
+  places.forEach(place => {
+      const marker = L.marker([place.lat, place.lng]).addTo(map);
+      marker.bindPopup(`<b>${place.name}</b><br>${place.location}`);
+  });
+</script>
 {% endif %}
 
 {% endblock %}
