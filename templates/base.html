@@ -42,6 +42,8 @@
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
                 <li>
+                  <li><a class="dropdown-item" href="{% url 'favorites_list' %}">Favorites</a></li>
+
                   <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="dropdown-item text-danger">Logout</button>
@@ -71,7 +73,7 @@
 
   <!-- Bootstrap JS -->
   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-  
+
   <!--Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
