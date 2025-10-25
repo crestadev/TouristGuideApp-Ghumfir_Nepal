@@ -10,7 +10,6 @@ from guides.models import Itinerary, Place
 
 
 
-
 @login_required
 def profile_view(request):
     if request.method == 'POST':
@@ -33,18 +32,22 @@ def profile_view(request):
     places_with_coords = []
     if itinerary:
         for p in itinerary.places.all():
-            if p.latitude and p.longitude:
+            if getattr(p, 'latitude', None) and getattr(p, 'longitude', None):
                 places_with_coords.append({
                     'name': p.name,
-                    'lat': p.latitude,
-                    'lng': p.longitude,
+                    'lat': float(p.latitude),
+                    'lng': float(p.longitude),
                     'location': p.location,
                 })
+
+    # Get user's favorites (place IDs) for template
+    user_favorites = request.user.favorites.values_list('place_id', flat=True)
 
     # Render template
     return render(request, 'accounts/profile.html', {
         'itinerary': itinerary,
         'places_with_coords': places_with_coords,
+        'user_favorites': user_favorites,
     })
 
 def signup_view(request):
@@ -69,3 +72,8 @@ def remove_favorite(request, place_id):
     place = get_object_or_404(Place, id=place_id)
     Favorite.objects.filter(user=request.user, place=place).delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def favorites_list(request):
+    favorites = request.user.favorites.all()
+    return render(request, 'accounts/favorites.html', {'favorites': favorites})
