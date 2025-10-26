@@ -6,7 +6,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
 
     # Favorites / Wishlist URLs
-    path('favorites/add/<int:place_id>/', views.add_favorite, name='add_favorite'),
-    path('favorites/remove/<int:place_id>/', views.remove_favorite, name='remove_favorite'),
+    path('favorites/add/<int:place_id>/', views.add_favorite_ajax, name='add_favorite_ajax'),
+    path('favorites/remove/<int:place_id>/', views.remove_favorite_ajax, name='remove_favorite_ajax'),
     path('favorites/', views.favorites_list, name='favorites_list'),  # optional page to list all favorites
 ]
