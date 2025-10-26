@@ -49,4 +49,13 @@ form label {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border: 2px solid #dee2e6;
   }
+
+  .favorite-btn i {
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .favorite-btn.active i {
+    transform: scale(1.2);
+    color: #dc3545;
+  }
+  
   
