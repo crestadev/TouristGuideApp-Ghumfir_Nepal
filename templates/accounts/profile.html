@@ -48,17 +48,24 @@
               <!-- View Details Button -->
               <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
             
-              <!-- Add/Remove Favorite Button -->
-              {% if user.is_authenticated %}
-                {% if place.id in user_favorites %}
-                  <a href="{% url 'remove_favorite' place.id %}" class="btn btn-warning btn-sm ms-2">★ Remove</a>
-                {% else %}
-                  <a href="{% url 'add_favorite' place.id %}" class="btn btn-outline-warning btn-sm ms-2">☆ Add</a>
-                {% endif %}
-              {% endif %}
-            </div>
-            
-          
+              <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                  {% if place.image %}
+                    <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
+                  {% endif %}
+                  <div class="card-body text-center">
+                    <h5 class="card-title">{{ place.name }}</h5>
+                    <p class="text-muted">{{ place.location }}</p>
+              
+                    <button 
+                      class="btn btn-outline-warning btn-sm favorite-btn" 
+                      data-place-id="{{ place.id }}">
+                      ☆ Add to Favorites
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
         </div>
       </div>
     {% endfor %}
