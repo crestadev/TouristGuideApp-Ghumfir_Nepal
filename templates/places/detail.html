@@ -15,34 +15,28 @@
       <p class="text-muted">{{ place.location }}</p>
       <p>{{ place.description }}</p>
 
-      <div class="container py-5">
-        <div class="row">
-          <div class="col-md-6">
-            {% if place.image %}
-              <img src="{{ place.image.url }}" class="img-fluid rounded" alt="{{ place.name }}">
-            {% endif %}
-          </div>
-          <div class="col-md-6">
-            <h2>{{ place.name }}</h2>
-            <p class="text-muted">{{ place.location }}</p>
-            <p>{{ place.description }}</p>
-      
-            {% if user.is_authenticated %}
-              <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success mt-2">Add to My Itinerary</button>
-              </form>
-            {% else %}
-              <a href="{% url 'login' %}" class="btn btn-outline-primary mt-2">Login to Save</a>
-            {% endif %}
-          </div>
-        </div>
-      </div>
+      <!-- Add to Itinerary -->
+      {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success mt-2">Add to My Itinerary</button>
+        </form>
+
+        <!-- Favorite Button -->
+        <button class="btn btn-outline-warning mt-2 favorite-btn" data-place-id="{{ place.id }}">
+          {% if place.id in user_favorites %}
+            <i class="fa-solid fa-star text-warning"></i> Added
+          {% else %}
+            <i class="fa-regular fa-star"></i> Add to Favorites
+          {% endif %}
+        </button>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-primary mt-2">Login to Save</a>
+      {% endif %}
 
       <hr>
       <h4 class="mt-5">Reviews</h4>
 
-      <!-- Display existing reviews -->
       {% for review in reviews %}
         <div class="border rounded p-2 mb-2">
           <strong>{{ review.name }}</strong> — ⭐ {{ review.rating }}/5<br>
@@ -52,8 +46,7 @@
       {% empty %}
         <p>No reviews yet. Be the first to review!</p>
       {% endfor %}
-      
-      <!-- Review Form -->
+
       <div class="mt-4">
         <h5>Add a Review</h5>
         <form method="post" class="border rounded p-3 shadow-sm bg-light">
@@ -73,7 +66,7 @@
           <button type="submit" class="btn btn-primary">Submit Review</button>
         </form>
       </div>
-      
+    </div>
 
     <div class="col-md-4">
       <h4 class="mb-3">Nearby Hotels</h4>
@@ -97,4 +90,36 @@
     </div>
   </div>
 </div>
+
+<!-- Favorite Button JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const button = document.querySelector(".favorite-btn");
+
+  if (button) {
+    button.addEventListener("click", function () {
+      const placeId = this.dataset.placeId;
+      const icon = this.querySelector("i");
+
+      fetch(`/favorites/toggle/${placeId}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "added") {
+          icon.classList.replace("fa-regular", "fa-solid");
+          button.innerHTML = `<i class="fa-solid fa-star text-warning"></i> Added`;
+        } else if (data.status === "removed") {
+          icon.classList.replace("fa-solid", "fa-regular");
+          button.innerHTML = `<i class="fa-regular fa-star"></i> Add to Favorites`;
+        }
+      });
+    });
+  }
+});
+</script>
+
 {% endblock %}

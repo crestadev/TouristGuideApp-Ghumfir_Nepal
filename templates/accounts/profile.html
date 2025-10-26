@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Profile{% endblock %}
 
 {% block content %}
@@ -33,45 +35,38 @@
 <h4 class="text-center mb-3">My Itinerary</h4>
 
 {% if itinerary and itinerary.places.all %}
-  <div class="row">
-    {% for place in itinerary.places.all %}
-      <div class="col-md-4 mb-3">
-        <div class="card h-100">
-          {% if place.image %}
-            <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
-          {% endif %}
-          <div class="card-body">
-            <div class="card-body">
-              <h5 class="card-title">{{ place.name }}</h5>
-              <p class="text-muted">{{ place.location }}</p>
-            
-              <!-- View Details Button -->
-              <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
-            
-              <div class="col-md-4 mb-3">
-                <div class="card h-100">
-                  {% if place.image %}
-                    <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
-                  {% endif %}
-                  <div class="card-body text-center">
-                    <h5 class="card-title">{{ place.name }}</h5>
-                    <p class="text-muted">{{ place.location }}</p>
-              
-                    <button 
-                      class="btn btn-outline-warning btn-sm favorite-btn" 
-                      data-place-id="{{ place.id }}">
-                      ☆ Add to Favorites
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
+<div class="row">
+  {% for place in itinerary.places.all %}
+    <div class="col-md-4 mb-3">
+      <div class="card h-100 shadow-sm">
+        {% if place.image %}
+          <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
+        {% endif %}
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ place.name }}</h5>
+          <p class="text-muted">{{ place.location }}</p>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-center gap-2">
+            <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
+
+            <button 
+              class="btn btn-outline-warning btn-sm favorite-btn" 
+              data-place-id="{{ place.id }}">
+              {% if place.id in user_favorites %}
+                <i class="fa-solid fa-star text-warning"></i> Added
+              {% else %}
+                <i class="fa-regular fa-star"></i> Add to Favorites
+              {% endif %}
+            </button>
+          </div>
         </div>
       </div>
-    {% endfor %}
-  </div>
+    </div>
+  {% endfor %}
+</div>
 {% else %}
-  <p class="text-center text-muted">You haven’t added any places yet.</p>
+<p class="text-center text-muted">You haven’t added any places yet.</p>
 {% endif %}
 
 <!-- Map Section -->
@@ -79,64 +74,58 @@
 <h4 class="text-center mb-3">My Itinerary Map</h4>
 
 {% if itinerary and itinerary.places.all %}
-  <div id="map" style="height: 500px; border-radius: 10px;"></div>
+<div id="map" style="height: 500px; border-radius: 10px;"></div>
 {% else %}
-  <p class="text-center text-muted">Add places to your itinerary to see them on the map.</p>
+<p class="text-center text-muted">Add places to your itinerary to see them on the map.</p>
 {% endif %}
 
-<!--  Map Script -->
+<!-- Map JS -->
 {% if itinerary and itinerary.places.all %}
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-      const map = L.map('map').setView([28.3949, 84.1240], 7);
+document.addEventListener("DOMContentLoaded", function() {
+    const map = L.map('map').setView([28.3949, 84.1240], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 18,
-          attribution: '© OpenStreetMap'
-      }).addTo(map);
-
-      const places = {{ places_with_coords|safe }};
-      places.forEach(place => {
-          const marker = L.marker([place.lat, place.lng]).addTo(map);
-          marker.bindPopup(`<b>${place.name}</b><br>${place.location}`);
-      });
-  });
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const buttons = document.querySelectorAll(".favorite-btn");
-    
-      buttons.forEach(button => {
-        button.addEventListener("click", function () {
-          const placeId = this.dataset.placeId;
-          const isAdding = this.textContent.includes("Add");
-          const url = isAdding
-            ? `/favorites/add/${placeId}/`
-            : `/favorites/remove/${placeId}/`;
-    
-          fetch(url, {
-            method: "POST",
-            headers: {
-              "X-CSRFToken": "{{ csrf_token }}",
-            },
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === "added") {
-              this.textContent = "★ Remove from Favorites";
-              this.classList.remove("btn-outline-warning");
-              this.classList.add("btn-warning");
-            } else if (data.status === "removed") {
-              this.textContent = "☆ Add to Favorites";
-              this.classList.remove("btn-warning");
-              this.classList.add("btn-outline-warning");
-            }
-          });
-        });
-      });
+    const places = {{ places_with_coords|safe }};
+    places.forEach(place => {
+        const marker = L.marker([place.lat, place.lng]).addTo(map);
+        marker.bindPopup(`<b>${place.name}</b><br>${place.location}`);
     });
-    
+});
 </script>
 {% endif %}
 
+<!-- Favorite Toggle JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const buttons = document.querySelectorAll(".favorite-btn");
 
+  buttons.forEach(button => {
+    button.addEventListener("click", function () {
+      const placeId = this.dataset.placeId;
+      const icon = this.querySelector("i");
+
+      fetch(`/favorites/toggle/${placeId}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "added") {
+          icon.classList.replace("fa-regular", "fa-solid");
+          this.innerHTML = `<i class="fa-solid fa-star text-warning"></i> Added`;
+        } else if (data.status === "removed") {
+          icon.classList.replace("fa-solid", "fa-regular");
+          this.innerHTML = `<i class="fa-regular fa-star"></i> Add to Favorites`;
+        }
+      });
+    });
+  });
+});
+</script>
 {% endblock %}
