@@ -101,6 +101,40 @@
           marker.bindPopup(`<b>${place.name}</b><br>${place.location}`);
       });
   });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const buttons = document.querySelectorAll(".favorite-btn");
+    
+      buttons.forEach(button => {
+        button.addEventListener("click", function () {
+          const placeId = this.dataset.placeId;
+          const isAdding = this.textContent.includes("Add");
+          const url = isAdding
+            ? `/favorites/add/${placeId}/`
+            : `/favorites/remove/${placeId}/`;
+    
+          fetch(url, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "added") {
+              this.textContent = "★ Remove from Favorites";
+              this.classList.remove("btn-outline-warning");
+              this.classList.add("btn-warning");
+            } else if (data.status === "removed") {
+              this.textContent = "☆ Add to Favorites";
+              this.classList.remove("btn-warning");
+              this.classList.add("btn-outline-warning");
+            }
+          });
+        });
+      });
+    });
+    
 </script>
 {% endif %}
 
