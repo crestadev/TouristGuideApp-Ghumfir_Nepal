@@ -4,7 +4,8 @@ from django.contrib.auth import login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Favorite
+from .models import Favorite, Place
+from django.http import JsonResponse
 
 from guides.models import Itinerary, Place
 
@@ -62,18 +63,19 @@ def signup_view(request):
     return render(request, 'accounts/signup.html', {'form': form})
 
 @login_required
-def add_favorite(request, place_id):
-    place = get_object_or_404(Place, id=place_id)
-    Favorite.objects.get_or_create(user=request.user, place=place)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+def add_favorite_ajax(request, place_id):
+    place = Place.objects.get(id=place_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
+    if created:
+        return JsonResponse({'status': 'added'})
+    else:
+        return JsonResponse({'status': 'exists'})
 
 @login_required
-def remove_favorite(request, place_id):
-    place = get_object_or_404(Place, id=place_id)
-    Favorite.objects.filter(user=request.user, place=place).delete()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
-
-@login_required
-def favorites_list(request):
-    favorites = request.user.favorites.all()
-    return render(request, 'accounts/favorites.html', {'favorites': favorites})
+def remove_favorite_ajax(request, place_id):
+    try:
+        favorite = Favorite.objects.get(user=request.user, place_id=place_id)
+        favorite.delete()
+        return JsonResponse({'status': 'removed'})
+    except Favorite.DoesNotExist:
+        return JsonResponse({'status': 'not_found'})
