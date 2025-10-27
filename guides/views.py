@@ -1,20 +1,9 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from .models import Place, Category, Itinerary, Favorite
+from .models import Favorite, Place, Category, Itinerary
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from django.http import JsonResponse
-
-@login_required
-def toggle_favorite(request, place_id):
-    place = get_object_or_404(Place, id=place_id)
-    favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
-
-    if not created:
-        favorite.delete()
-        return JsonResponse({'status': 'removed'})
-    return JsonResponse({'status': 'added'})
 
 
 def home(request):
@@ -48,27 +37,24 @@ def place_list(request):
 
 def place_detail(request, slug):
     place = get_object_or_404(Place, slug=slug)
-    reviews = place.review_set.all()
-    related_hotels = place.hotel_set.all()
-    form = ReviewForm(request.POST or None)
+    related_hotels = place.hotels.all()
+    reviews = place.reviews.all().order_by('-created_at')
 
-    is_favorite = False
-    if request.user.is_authenticated:
-        is_favorite = Favorite.objects.filter(user=request.user, place=place).exists()
-
-    if request.method == 'POST' and form.is_valid():
-        review = form.save(commit=False)
-        review.place = place
-        review.save()
-        messages.success(request, "Review added successfully!")
-        return redirect('place_detail', slug=slug)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.place = place
+            review.save()
+            return redirect('place_detail', slug=slug)
+    else:
+        form = ReviewForm()
 
     return render(request, 'places/detail.html', {
         'place': place,
-        'reviews': reviews,
         'related_hotels': related_hotels,
+        'reviews': reviews,
         'form': form,
-        'is_favorite': is_favorite,
     })
 
 @login_required
@@ -98,15 +84,3 @@ def remove_from_favorites(request, place_id):
     Favorite.objects.filter(user=request.user, place=place).delete()
     messages.success(request, f"{place.name} removed from your favorites.")
     return redirect('profile')
-
-
-
-@login_required
-def toggle_favorite(request, place_id):
-    place = get_object_or_404(Place, id=place_id)
-    favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
-
-    if not created:
-        favorite.delete()
-        return JsonResponse({'status': 'removed'})
-    return JsonResponse({'status': 'added'})
