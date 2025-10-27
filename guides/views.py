@@ -34,26 +34,30 @@ def place_list(request):
         'category_filter': category_filter,
     }
     return render(request, 'places/list.html', context)
+
 def place_detail(request, slug):
     place = get_object_or_404(Place, slug=slug)
-    related_hotels = place.hotels.all()
-    reviews = place.reviews.all().order_by('-created_at')
+    reviews = place.review_set.all()
+    related_hotels = place.hotel_set.all()
+    form = ReviewForm(request.POST or None)
 
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.place = place
-            review.save()
-            return redirect('place_detail', slug=slug)
-    else:
-        form = ReviewForm()
+    is_favorite = False
+    if request.user.is_authenticated:
+        is_favorite = Favorite.objects.filter(user=request.user, place=place).exists()
+
+    if request.method == 'POST' and form.is_valid():
+        review = form.save(commit=False)
+        review.place = place
+        review.save()
+        messages.success(request, "Review added successfully!")
+        return redirect('place_detail', slug=slug)
 
     return render(request, 'places/detail.html', {
         'place': place,
-        'related_hotels': related_hotels,
         'reviews': reviews,
+        'related_hotels': related_hotels,
         'form': form,
+        'is_favorite': is_favorite,
     })
 
 @login_required
@@ -83,3 +87,5 @@ def remove_from_favorites(request, place_id):
     Favorite.objects.filter(user=request.user, place=place).delete()
     messages.success(request, f"{place.name} removed from your favorites.")
     return redirect('profile')
+
+

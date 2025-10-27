@@ -17,12 +17,19 @@
 
       <!-- Add to Itinerary -->
       {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
+      <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success mt-2">Add to My Itinerary</button>
+      </form>
+    
+      {% if is_favorite %}
+        <form method="POST" action="{% url 'remove_from_favorites' place.id %}" class="mt-2">
           {% csrf_token %}
-          <button type="submit" class="btn btn-success mt-2">Add to My Itinerary</button>
+          <button type="submit" class="btn btn-danger">
+            💔 Remove from Favorites
+          </button>
         </form>
-
-        {% if user.is_authenticated %}
+      {% else %}
         <form method="POST" action="{% url 'add_to_favorites' place.id %}" class="mt-2">
           {% csrf_token %}
           <button type="submit" class="btn btn-outline-danger">
@@ -30,6 +37,8 @@
           </button>
         </form>
       {% endif %}
+    {% endif %}
+    
       
       <hr>
       <h4 class="mt-5">Reviews</h4>
