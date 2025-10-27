@@ -50,15 +50,7 @@
           <div class="d-flex justify-content-center gap-2">
             <a href="{% url 'place_detail' place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
 
-            <button 
-              class="btn btn-outline-warning btn-sm favorite-btn" 
-              data-place-id="{{ place.id }}">
-              {% if place.id in user_favorites %}
-                <i class="fa-solid fa-star text-warning"></i> Added
-              {% else %}
-                <i class="fa-regular fa-star"></i> Add to Favorites
-              {% endif %}
-            </button>
+
           </div>
         </div>
       </div>
@@ -78,6 +70,34 @@
 {% else %}
 <p class="text-center text-muted">Add places to your itinerary to see them on the map.</p>
 {% endif %}
+<hr class="my-4">
+<h4 class="text-center mb-3">My Favorites ❤️</h4>
+
+{% if favorites %}
+  <div class="row">
+    {% for fav in favorites %}
+      <div class="col-md-4 mb-3">
+        <div class="card h-100 shadow-sm">
+          {% if fav.place.image %}
+            <img src="{{ fav.place.image.url }}" class="card-img-top" alt="{{ fav.place.name }}">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ fav.place.name }}</h5>
+            <p class="text-muted">{{ fav.place.location }}</p>
+            <a href="{% url 'place_detail' fav.place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
+            <form method="POST" action="{% url 'remove_from_favorites' fav.place.id %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-center text-muted">You haven’t added any favorites yet.</p>
+{% endif %}
+
 
 <!-- Map JS -->
 {% if itinerary and itinerary.places.all %}
@@ -98,34 +118,4 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 {% endif %}
 
-<!-- Favorite Toggle JS -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const buttons = document.querySelectorAll(".favorite-btn");
-
-  buttons.forEach(button => {
-    button.addEventListener("click", function () {
-      const placeId = this.dataset.placeId;
-      const icon = this.querySelector("i");
-
-      fetch(`/favorites/toggle/${placeId}/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}",
-        },
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "added") {
-          icon.classList.replace("fa-regular", "fa-solid");
-          this.innerHTML = `<i class="fa-solid fa-star text-warning"></i> Added`;
-        } else if (data.status === "removed") {
-          icon.classList.replace("fa-solid", "fa-regular");
-          this.innerHTML = `<i class="fa-regular fa-star"></i> Add to Favorites`;
-        }
-      });
-    });
-  });
-});
-</script>
 {% endblock %}
