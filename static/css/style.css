@@ -50,12 +50,13 @@ form label {
     border: 2px solid #dee2e6;
   }
 
-  .favorite-btn i {
-    transition: transform 0.2s ease, color 0.2s ease;
-  }
-  .favorite-btn.active i {
-    transform: scale(1.2);
-    color: #dc3545;
+  .btn-outline-danger {
+    border-radius: 8px;
+    transition: 0.2s;
   }
   
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+  }
   
