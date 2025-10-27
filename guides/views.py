@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from .models import Place, Category, Itinerary
+from .models import Place, Category, Itinerary, Favorite
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -63,3 +63,23 @@ def add_to_itinerary(request, place_id):
     itinerary.places.add(place)
     messages.success(request, f"{place.name} added to your itinerary!")
     return redirect('place_detail', slug=place.slug)
+
+
+
+@login_required
+def add_to_favorites(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
+    if created:
+        messages.success(request, f"{place.name} added to your favorites!")
+    else:
+        messages.info(request, f"{place.name} is already in your favorites.")
+    return redirect('place_detail', slug=place.slug)
+
+
+@login_required
+def remove_from_favorites(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    Favorite.objects.filter(user=request.user, place=place).delete()
+    messages.success(request, f"{place.name} removed from your favorites.")
+    return redirect('profile')
