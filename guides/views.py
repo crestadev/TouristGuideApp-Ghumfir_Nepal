@@ -4,6 +4,17 @@ from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
+from django.http import JsonResponse
+
+@login_required
+def toggle_favorite(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
+
+    if not created:
+        favorite.delete()
+        return JsonResponse({'status': 'removed'})
+    return JsonResponse({'status': 'added'})
 
 
 def home(request):
@@ -89,3 +100,13 @@ def remove_from_favorites(request, place_id):
     return redirect('profile')
 
 
+
+@login_required
+def toggle_favorite(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
+
+    if not created:
+        favorite.delete()
+        return JsonResponse({'status': 'removed'})
+    return JsonResponse({'status': 'added'})

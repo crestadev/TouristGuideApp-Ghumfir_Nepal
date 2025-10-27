@@ -6,6 +6,7 @@ urlpatterns = [
     path('<slug:slug>/', views.place_detail, name='place_detail'),
     path('add/<int:place_id>/', views.add_to_itinerary, name='add_to_itinerary'),
     path('places/favorite/<int:place_id>/', views.add_to_favorites, name='add_to_favorites'),
-    path('places/unfavorite/<int:place_id>/', views.remove_from_favorites, name='remove_from_favorites'),
+    path('places/unfavorite/<int:place_id>/', views.remove_from_favorites, name='remove_from_favorites'),   
+    path('favorites/toggle/<int:place_id>/', views.toggle_favorite, name='toggle_favorite'),
 
 ]
