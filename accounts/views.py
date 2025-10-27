@@ -75,3 +75,20 @@ def toggle_favorite(request, place_id):
         status = "added"
 
     return JsonResponse({"status": status, "place_id": place.id})
+
+@login_required
+def toggle_favorite(request, place_id):
+    if request.method == "POST":
+        place = get_object_or_404(Place, id=place_id)
+        favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
+
+        if created:
+            status = "added"
+        else:
+            # Remove the favorite
+            favorite.delete()
+            status = "removed"
+
+        return JsonResponse({"status": status})
+
+    return JsonResponse({"status": "error"}, status=400)
