@@ -3,9 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from .models import Favorite
-from guides.models import Place, Itinerary
+from guides.models import  Itinerary
 
 # Profile view
 @login_required
@@ -58,37 +56,3 @@ def signup_view(request):
     else:
         form = UserCreationForm()
     return render(request, 'accounts/signup.html', {'form': form})
-
-# AJAX Add/Remove Favorites
-@login_required
-def toggle_favorite(request, place_id):
-    place = get_object_or_404(Place, id=place_id)
-
-    # Check if already favorited
-    favorite = Favorite.objects.filter(user=request.user, place=place).first()
-
-    if favorite:
-        favorite.delete()
-        status = "removed"
-    else:
-        Favorite.objects.create(user=request.user, place=place)
-        status = "added"
-
-    return JsonResponse({"status": status, "place_id": place.id})
-
-@login_required
-def toggle_favorite(request, place_id):
-    if request.method == "POST":
-        place = get_object_or_404(Place, id=place_id)
-        favorite, created = Favorite.objects.get_or_create(user=request.user, place=place)
-
-        if created:
-            status = "added"
-        else:
-            # Remove the favorite
-            favorite.delete()
-            status = "removed"
-
-        return JsonResponse({"status": status})
-
-    return JsonResponse({"status": "error"}, status=400)
