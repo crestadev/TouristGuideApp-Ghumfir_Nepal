@@ -1,8 +1,9 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from .models import Favorite, Place, Category, Itinerary
+from .models import Favorite, Place, Category, Itinerary, Review
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Avg
 
 
 
@@ -37,23 +38,37 @@ def place_list(request):
 
 def place_detail(request, slug):
     place = get_object_or_404(Place, slug=slug)
-    related_hotels = place.hotels.all()
+    related_hotels = getattr(place, 'hotels', []).all()  # if hotels exist
     reviews = place.reviews.all().order_by('-created_at')
+    average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
 
-    if request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
-            review = form.save(commit=False)
-            review.place = place
-            review.save()
+            # Save or update review for this user & place
+            review, created = Review.objects.update_or_create(
+                user=request.user,
+                place=place,
+                defaults=form.cleaned_data
+            )
+            messages.success(request, "Your review has been submitted!")
             return redirect('place_detail', slug=slug)
     else:
-        form = ReviewForm()
+        # Pre-fill form if user already reviewed
+        if request.user.is_authenticated:
+            try:
+                existing = Review.objects.get(user=request.user, place=place)
+                form = ReviewForm(instance=existing)
+            except Review.DoesNotExist:
+                form = ReviewForm()
+        else:
+            form = None  # non-logged-in users can't submit
 
     return render(request, 'places/detail.html', {
         'place': place,
         'related_hotels': related_hotels,
         'reviews': reviews,
+        'average_rating': average_rating,
         'form': form,
     })
 
