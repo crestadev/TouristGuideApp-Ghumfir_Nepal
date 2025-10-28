@@ -17,35 +17,61 @@
 
       <!-- Add to Itinerary -->
       {% if user.is_authenticated %}
-      <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success mt-2">Add to My Itinerary</button>
-      </form>
-    
-      {% if is_favorite %}
-        <form method="POST" action="{% url 'remove_from_favorites' place.id %}" class="mt-2">
+        <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger">
-            💔 Remove from Favorites
-          </button>
+          <button type="submit" class="btn btn-success mt-2">Add to My Itinerary</button>
         </form>
-      {% else %}
-        <form method="POST" action="{% url 'add_to_favorites' place.id %}" class="mt-2">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-outline-danger">
-            ❤️ Add to Favorites
-          </button>
-        </form>
+
+        <!-- Favorites -->
+        {% if is_favorite %}
+          <form method="POST" action="{% url 'remove_from_favorites' place.id %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+              💔 Remove from Favorites
+            </button>
+          </form>
+        {% else %}
+          <form method="POST" action="{% url 'add_to_favorites' place.id %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger">
+              ❤️ Add to Favorites
+            </button>
+          </form>
+        {% endif %}
       {% endif %}
-    {% endif %}
-    
-      
+
       <hr>
       <h4 class="mt-5">Reviews</h4>
 
+      <!-- Average rating -->
+      {% if average_rating %}
+        <p>
+          <strong>Average Rating:</strong>
+          {% for i in "12345" %}
+            {% if i|int <= average_rating|float %}
+              <span class="text-warning">★</span>
+            {% else %}
+              <span class="text-muted">☆</span>
+            {% endif %}
+          {% endfor %}
+          ({{ average_rating|floatformat:1 }}/5)
+        </p>
+      {% endif %}
+
+      <!-- Review List -->
       {% for review in reviews %}
         <div class="border rounded p-2 mb-2">
-          <strong>{{ review.name }}</strong> — ⭐ {{ review.rating }}/5<br>
+          <strong>{{ review.user.username }}</strong>
+          <span>
+            {% for i in "12345" %}
+              {% if i|int <= review.rating %}
+                <span class="text-warning">★</span>
+              {% else %}
+                <span class="text-muted">☆</span>
+              {% endif %}
+            {% endfor %}
+          </span>
+          <br>
           <small>{{ review.created_at|date:"M d, Y" }}</small>
           <p>{{ review.comment }}</p>
         </div>
@@ -53,27 +79,30 @@
         <p>No reviews yet. Be the first to review!</p>
       {% endfor %}
 
-      <div class="mt-4">
-        <h5>Add a Review</h5>
-        <form method="post" class="border rounded p-3 shadow-sm bg-light">
-          {% csrf_token %}
-          <div class="mb-3">
-            {{ form.name.label_tag }}
-            {{ form.name }}
-          </div>
-          <div class="mb-3">
-            {{ form.rating.label_tag }}
-            {{ form.rating }}
-          </div>
-          <div class="mb-3">
-            {{ form.comment.label_tag }}
-            {{ form.comment }}
-          </div>
-          <button type="submit" class="btn btn-primary">Submit Review</button>
-        </form>
-      </div>
+      <!-- Review Form -->
+      {% if user.is_authenticated %}
+        <div class="mt-4">
+          <h5>Add a Review</h5>
+          <form method="post" class="border rounded p-3 shadow-sm bg-light">
+            {% csrf_token %}
+            <div class="mb-3">
+              {{ form.rating.label_tag }}
+              {{ form.rating }}
+            </div>
+            <div class="mb-3">
+              {{ form.comment.label_tag }}
+              {{ form.comment }}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+          </form>
+        </div>
+      {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to write a review.</p>
+      {% endif %}
+
     </div>
 
+    <!-- Nearby Hotels -->
     <div class="col-md-4">
       <h4 class="mb-3">Nearby Hotels</h4>
       {% for hotel in related_hotels %}
@@ -96,5 +125,4 @@
     </div>
   </div>
 </div>
-
 {% endblock %}
