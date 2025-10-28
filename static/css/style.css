@@ -60,3 +60,23 @@ form label {
     color: #fff;
   }
   
+
+  .text-warning {
+    color: #ffc107 !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.border {
+    border-radius: 10px !important;
+}
+
+.card-img-top {
+    border-radius: 10px 10px 0 0;
+}
+
+form .form-control, form .form-select {
+    border-radius: 8px;
+}
