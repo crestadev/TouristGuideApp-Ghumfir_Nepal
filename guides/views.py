@@ -40,7 +40,7 @@ def place_detail(request, slug):
     place = get_object_or_404(Place, slug=slug)
     related_hotels = getattr(place, 'hotels', []).all()  # if hotels exist
     reviews = place.reviews.all().order_by('-created_at')
-    average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+    average_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
     if request.user.is_authenticated and request.method == 'POST':
         form = ReviewForm(request.POST)

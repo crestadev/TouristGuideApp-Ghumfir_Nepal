@@ -47,8 +47,8 @@
       {% if average_rating %}
         <p>
           <strong>Average Rating:</strong>
-          {% for i in "12345" %}
-            {% if i|int <= average_rating|float %}
+          {% for _ in "12345" %}
+            {% if forloop.counter <= average_rating %}
               <span class="text-warning">★</span>
             {% else %}
               <span class="text-muted">☆</span>
@@ -63,8 +63,8 @@
         <div class="border rounded p-2 mb-2">
           <strong>{{ review.user.username }}</strong>
           <span>
-            {% for i in "12345" %}
-              {% if i|int <= review.rating %}
+            {% for _ in "12345" %}
+              {% if forloop.counter <= review.rating %}
                 <span class="text-warning">★</span>
               {% else %}
                 <span class="text-muted">☆</span>
