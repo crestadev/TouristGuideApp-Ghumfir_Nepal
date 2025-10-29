@@ -74,8 +74,9 @@ class Itinerary(models.Model):
         return f"{self.user.username}'s Itinerary"
 
 
+
 class ItineraryItem(models.Model):
-    itinerary = models.ForeignKey(Itinerary, on_delete=models.CASCADE)
+    itinerary = models.ForeignKey('Itinerary', on_delete=models.CASCADE)
     place = models.ForeignKey('Place', on_delete=models.CASCADE)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
