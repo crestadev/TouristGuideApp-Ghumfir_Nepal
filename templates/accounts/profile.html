@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="container py-5">
+  <!-- Profile Section -->
   <div class="row justify-content-center">
     <div class="col-md-6">
       <h3 class="text-center mb-4">Your Profile</h3>
@@ -17,6 +18,7 @@
 
       <form method="POST">
         {% csrf_token %}
+        <input type="hidden" name="update_profile" value="1">
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
           <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
@@ -32,57 +34,97 @@
 </div>
 
 <hr class="my-4">
-<h4 class="text-center mb-3">My Itinerary </h4>
+<!-- Itinerary Section -->
+<h4 class="text-center mb-3">My Itinerary 🗓️</h4>
 
-{% if itinerary_items %}
-<div class="row">
-  {% for item in itinerary_items %}
-    <div class="col-md-4 mb-3">
-      <div class="card h-100 shadow-sm">
-        {% if item.place.image %}
-          <img src="{{ item.place.image.url }}" class="card-img-top" alt="{{ item.place.name }}">
-        {% endif %}
-        <div class="card-body text-center">
-          <h5 class="card-title">{{ item.place.name }}</h5>
-          <p class="text-muted">{{ item.place.location }}</p>
+{% if itinerary_forms %}
+  <div class="row">
+    {% for item, form in itinerary_forms %}
+      <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
+          {% if item.place.image %}
+            <img src="{{ item.place.image.url }}" class="card-img-top" alt="{{ item.place.name }}">
+          {% endif %}
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ item.place.name }}</h5>
+            <p class="text-muted">{{ item.place.location }}</p>
 
-          <!-- Start/End Date Form -->
-          <form method="POST" class="d-flex justify-content-center gap-1 mb-2">
-            {% csrf_token %}
-            <input type="hidden" name="item_id" value="{{ item.id }}">
-            {{ forms[item.id].start_date }}
-            {{ forms[item.id].end_date }}
-            <button type="submit" class="btn btn-outline-success btn-sm">💾</button>
-          </form>
-
-          <!-- View / Remove Buttons -->
-          <div class="d-flex justify-content-center gap-2">
-            <a href="{% url 'place_detail' item.place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
-            <form method="POST" action="{% url 'remove_from_itinerary' item.place.id %}">
+            <!-- Date Edit Form -->
+            <form method="POST" class="d-flex justify-content-center align-items-center mb-2">
               {% csrf_token %}
-              <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+              <input type="hidden" name="update_dates" value="1">
+              <input type="hidden" name="item_id" value="{{ item.id }}">
+              {{ form.start_date }}
+              {{ form.end_date }}
+              <button type="submit" class="btn btn-outline-success btn-sm ms-2">💾</button>
             </form>
+
+            <!-- View / Remove Buttons -->
+            <div class="d-flex justify-content-center gap-2">
+              <a href="{% url 'place_detail' item.place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
+              <form method="POST" action="{% url 'remove_from_itinerary' item.place.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+              </form>
+            </div>
+
           </div>
         </div>
       </div>
-    </div>
-  {% endfor %}
-</div>
+    {% endfor %}
+  </div>
 {% else %}
-<p class="text-center text-muted">You haven’t added any places yet.</p>
+  <p class="text-center text-muted">You haven’t added any places yet.</p>
 {% endif %}
 
 
-<!-- Map Section -->
 <hr class="my-4">
+<!-- Map Section -->
 <h4 class="text-center mb-3">My Itinerary Map</h4>
 
-{% if itinerary and itinerary.places.all %}
+{% if itinerary_items %}
 <div id="map" style="height: 500px; border-radius: 10px;"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Initialize map
+    const map = L.map('map').setView([28.3949, 84.1240], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Places with coordinates
+    const places = {{ places_with_coords|safe }};
+
+    const route = [];
+    places.forEach((place, index) => {
+        const marker = L.marker([place.lat, place.lng]).addTo(map);
+        marker.bindPopup(
+            `<b>${place.name}</b><br>${place.location}<br>` +
+            `<small>Stop ${index+1}</small>`
+        );
+        route.push([place.lat, place.lng]);
+    });
+
+    // Draw route line
+    if(route.length > 1){
+        L.polyline(route, {color: 'blue', weight: 3, opacity: 0.7}).addTo(map);
+    }
+
+    // Fit map to show all markers
+    if(route.length > 0){
+        const bounds = L.latLngBounds(route);
+        map.fitBounds(bounds, {padding: [50, 50]});
+    }
+});
+</script>
 {% else %}
 <p class="text-center text-muted">Add places to your itinerary to see them on the map.</p>
 {% endif %}
+
 <hr class="my-4">
+<!-- Favorites Section -->
 <h4 class="text-center mb-3">My Favorites ❤️</h4>
 
 {% if favorites %}
@@ -93,7 +135,7 @@
           {% if fav.place.image %}
             <img src="{{ fav.place.image.url }}" class="card-img-top" alt="{{ fav.place.name }}">
           {% endif %}
-          <div class="card-body">
+          <div class="card-body text-center">
             <h5 class="card-title">{{ fav.place.name }}</h5>
             <p class="text-muted">{{ fav.place.location }}</p>
             <a href="{% url 'place_detail' fav.place.slug %}" class="btn btn-outline-primary btn-sm">View</a>
@@ -108,26 +150,6 @@
   </div>
 {% else %}
   <p class="text-center text-muted">You haven’t added any favorites yet.</p>
-{% endif %}
-
-
-<!-- Map JS -->
-{% if itinerary and itinerary.places.all %}
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const map = L.map('map').setView([28.3949, 84.1240], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    const places = {{ places_with_coords|safe }};
-    places.forEach(place => {
-        const marker = L.marker([place.lat, place.lng]).addTo(map);
-        marker.bindPopup(`<b>${place.name}</b><br>${place.location}`);
-    });
-});
-</script>
 {% endif %}
 
 {% endblock %}
