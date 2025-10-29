@@ -1,5 +1,6 @@
+from datetime import date
 from django.shortcuts import redirect, render, get_object_or_404
-from .models import Favorite, Place, Category, Itinerary, Review
+from .models import Favorite, ItineraryItem, Place, Category, Itinerary, Review
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -76,8 +77,18 @@ def place_detail(request, slug):
 def add_to_itinerary(request, place_id):
     place = get_object_or_404(Place, id=place_id)
     itinerary, created = Itinerary.objects.get_or_create(user=request.user)
-    itinerary.places.add(place)
-    messages.success(request, f"{place.name} added to your itinerary!")
+
+    if not ItineraryItem.objects.filter(itinerary=itinerary, place=place).exists():
+        ItineraryItem.objects.create(
+            itinerary=itinerary,
+            place=place,
+            start_date=date.today(),
+            end_date=date.today()
+        )
+        messages.success(request, f"{place.name} added to your itinerary!")
+    else:
+        messages.info(request, f"{place.name} is already in your itinerary.")
+
     return redirect('place_detail', slug=place.slug)
 
 
