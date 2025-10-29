@@ -66,13 +66,26 @@ class Review(models.Model):
         return f"{self.user.username} - {self.place.name} ({self.rating}★)"
 
 class Itinerary(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    places = models.ManyToManyField(Place, related_name='itineraries')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    places = models.ManyToManyField('Place', through='ItineraryItem')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Itinerary of {self.user.username}"
-    
+        return f"{self.user.username}'s Itinerary"
+
+
+class ItineraryItem(models.Model):
+    itinerary = models.ForeignKey(Itinerary, on_delete=models.CASCADE)
+    place = models.ForeignKey('Place', on_delete=models.CASCADE)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['start_date']
+
+    def __str__(self):
+        return f"{self.place.name} ({self.start_date} → {self.end_date})"
+
     
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
