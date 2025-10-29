@@ -1,16 +1,17 @@
 from django import forms
-from .models import Review
+from .models import ItineraryItem
 
-class ReviewForm(forms.ModelForm):
+class ItineraryItemForm(forms.ModelForm):
     class Meta:
-        model = Review
-        fields = ['rating', 'comment']
+        model = ItineraryItem
+        fields = ['start_date', 'end_date']
         widgets = {
-            'rating': forms.Select(
-                choices=[(i, f'{i} Stars') for i in range(1, 6)],
-                attrs={'class': 'form-select'}
-            ),
-            'comment': forms.Textarea(
-                attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Write your review...'}
-            ),
+            'start_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'end_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
         }
