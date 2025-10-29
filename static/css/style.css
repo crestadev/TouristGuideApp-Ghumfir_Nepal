@@ -80,3 +80,7 @@ form label {
 form .form-control, form .form-select {
     border-radius: 8px;
 }
+form.d-flex input[type="date"] {
+  width: 48%;
+  margin-right: 4px;
+}
