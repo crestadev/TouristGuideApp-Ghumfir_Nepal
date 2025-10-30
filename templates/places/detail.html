@@ -15,6 +15,17 @@
       <p class="text-muted">{{ place.location }}</p>
       <p>{{ place.description }}</p>
 
+      {% if weather %}
+      <div class="alert alert-info mt-3">
+        <h5>🌤 Current Weather in {{ weather.city }}</h5>
+        <p>
+          <img src="http://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="Weather Icon" style="vertical-align: middle;">
+          {{ weather.temp }}°C — {{ weather.description }}
+        </p>
+      </div>
+      {% endif %}
+
+
       <!-- Add to Itinerary -->
       {% if user.is_authenticated %}
         <form method="POST" action="{% url 'add_to_itinerary' place.id %}">
