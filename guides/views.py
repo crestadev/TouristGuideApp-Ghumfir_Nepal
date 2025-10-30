@@ -5,6 +5,7 @@ from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg
+from .utils import get_weather
 
 
 
@@ -39,6 +40,8 @@ def place_list(request):
 
 def place_detail(request, slug):
     place = get_object_or_404(Place, slug=slug)
+    weather = get_weather(place.latitude, place.longitude)
+
     related_hotels = getattr(place, 'hotels', []).all()  # if hotels exist
     reviews = place.reviews.all().order_by('-created_at')
     average_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
@@ -71,6 +74,8 @@ def place_detail(request, slug):
         'reviews': reviews,
         'average_rating': average_rating,
         'form': form,
+        'weather': weather,
+
     })
 
 @login_required
