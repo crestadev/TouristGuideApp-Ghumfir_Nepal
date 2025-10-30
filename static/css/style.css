@@ -84,3 +84,9 @@ form.d-flex input[type="date"] {
   width: 48%;
   margin-right: 4px;
 }
+
+.alert-info {
+  border-radius: 10px;
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
