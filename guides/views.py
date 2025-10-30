@@ -91,6 +91,13 @@ def add_to_itinerary(request, place_id):
 
     return redirect('place_detail', slug=place.slug)
 
+@login_required
+def remove_from_itinerary(request, place_id):
+    place = get_object_or_404(Place, id=place_id)
+    itinerary = Itinerary.objects.filter(user=request.user).first()
+    if itinerary and place in itinerary.places.all():
+        itinerary.places.remove(place)
+    return redirect('profile')
 
 
 @login_required
