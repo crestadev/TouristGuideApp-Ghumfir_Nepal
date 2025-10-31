@@ -48,7 +48,12 @@
           <div class="card-body text-center">
             <h5 class="card-title">{{ item.place.name }}</h5>
             <p class="text-muted">{{ item.place.location }}</p>
-
+            <div class="text-center mt-3">
+              <a href="{% url 'export_itinerary_pdf' %}" class="btn btn-outline-success">
+                📄 Download My Itinerary (PDF)
+              </a>
+            </div>
+            
             <!-- Date Edit Form -->
             <form method="POST" class="d-flex justify-content-center align-items-center mb-2">
               {% csrf_token %}
